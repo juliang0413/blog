@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>{% block title %}Welcome!{% endblock %}</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    />
+    {% block stylesheets %}{% endblock %}
+  </head>
+  <body>
+    <nav
+      class="navbar navbar-expand-lg navbar-light bg-light"
+      style="height: 70px;"
+    >
+      <a class="navbar-brand" href="#">Symfony Blog</a>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent"></div>
+      <ul class="nav navbar-nav navbar-right">
+        {% if app.user %}
+            <li><a class="nav-link" href="{{ path('registration') }}">Home</a></li>
+            <li><a class="nav-link" href="{{ path('registration') }}">Logout</a></li>
+        {% else %}
+            <li><a class="nav-link" href="{{ path('registration') }}">Login</a></li>
+            <li>
+              <a class="nav-link" href="{{ path('registration') }}">Register</a>
+            </li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% for label, messages in app.flashes(['success', 'warning']) %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+    {% block body %}{% endblock %} 
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    {% block javascripts %}{% endblock %}
+  </body>
+</html>
