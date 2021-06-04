@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}My Posts!{% endblock %}
+
+{% block body %}
+    <div class="container mb-5">
+        <h1 class="text-center">My posts</h1>
+        <div class="row mt-4">
+            <a href="{{ path('newPost') }}" class="btn btn-primary">
+                <i class="fa fa-btn fa-plus"></i> Add New Post
+            </a>
+        </div>
+        <hr>
+        <div class="row justify-content-start">
+            {% for post in posts %}
+                <div class="mt-4 col-12 col-md-6 col-lg-4">
+                    <div class="card">
+                        <a href="{{ path('viewPost', { 'id': post.id }) }}">
+                            <img class="card-img-top" src="{{ asset('uploads/images/'~post.image) }}" alt="Card image cap">
+                        </a>
+                        <div class="card-body" style="height: 300px;">
+                            <h5 class="card-title text-title">{{ post.title }}</h5>
+                            <p class="card-text text-content">{{ post.content }}</p>
+                            <small class="text-muted">{{ post.publishdate | date }}</small>
+                        </div>
+                        <div class="card-footer">
+                            <small style="font-weight: 600;">{{ post.user.name }}</small>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+{% block stylesheets %}
+    <style>
+        .text-content {
+            font-size: small;
+            word-break: break-word;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            line-height: 17px;
+            max-height: 220px;
+            -webkit-line-clamp: 10;
+            -webkit-box-orient: vertical;
+        }
+        .text-title {
+            word-break: break-word;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+    </style>
+
+{% endblock %}

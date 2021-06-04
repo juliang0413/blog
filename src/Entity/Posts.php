@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\PostsRepository;
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -12,6 +13,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Posts
 {
+    const SUCCESSFUL_CREATED = 'Successful creation.';
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -57,6 +60,8 @@ class Posts
     public function __construct()
     {
         $this->comments = new ArrayCollection();
+        $this->likes = '';
+        $this->publish_date = new DateTime();
     }
 
     /**

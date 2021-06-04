@@ -27,7 +27,7 @@ class RegistrationController extends AbstractController
             $user->setPassword($passwordEncoder->encodePassword($user, $form->get('password')->getData()));
             $em->persist($user);
             $em->flush();
-            $this->addFlash('success', 'Successful registration.');
+            $this->addFlash('success', User::SUCCESSFUL_REGISTRATION);
 
             return $this->redirectToRoute('registration');
         }

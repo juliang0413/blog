@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello PostsController!{% endblock %}
+
+{% block body %}
+    <div class="container mb-5">
+        <div class="row mt-4 justify-content-center">
+            <div class="col-sm-8">
+                <div class="card">
+                    <a href="{{ path('viewPost', { 'id': post.id }) }}">
+                        <img class="card-img-top" src="{{ asset('uploads/images/'~post.image) }}" alt="Card image cap">
+                    </a>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ post.title }}</h5>
+                        <p class="card-text">{{ post.content }}</p>
+                        <small>{{ post.publishdate | date }}</small>
+                        <h5 class="mt-2">{{ post.user.name }}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        {% if post.comments.count > 0 %}
+            <h1>Comments</h1>
+            {% for comment in post.comments %}
+                <div class="alert alert-secondary" role="alert">
+                    <h4 class="alert-heading">{{ comment.user.name }}</h4>
+                    <p>{{ comment.content }}</p>
+                    <small class="text-muted">{{ comment.publishdate }}</small>
+                </div>
+            {% endfor %}
+        {% else %}
+            <h5>No comment</h5>
+        {% endif %}
+    </div>
+{% endblock %}

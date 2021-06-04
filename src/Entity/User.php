@@ -14,6 +14,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    const SUCCESSFUL_REGISTRATION = 'Successful registration.';
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
