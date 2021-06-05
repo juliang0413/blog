@@ -13,89 +13,125 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 
 class PostsController extends AbstractController
 {
-    /**
-     * @Route("/posts/new", name="newPost")
-     */
-    public function create(Request $request, SluggerInterface $slugger)
-    {
-        $post = new Posts();
-        $form = $this->createForm(PostsType::class, $post);
+	/**
+	 * @Route("/posts/new", name="newPost")
+	 */
+	public function create(Request $request, SluggerInterface $slugger)
+	{
+		$post = new Posts();
+		$form = $this->createForm(PostsType::class, $post);
 
-        $form->handleRequest($request);
+		$form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $user = $this->getUser();
-            $post->setUser($user);
-            $image = $form['image']->getData();
+		if ($form->isSubmitted() && $form->isValid())
+		{
+			$em   = $this->getDoctrine()->getManager();
+			$user = $this->getUser();
+			$post->setUser($user);
+			$image = $form['image']->getData();
 
-            if ($image) {
-                $originalFilename = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
-                // this is needed to safely include the file name as part of the URL
-                $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename . '-' . uniqid() . '.' . $image->guessExtension();
+			if ($image)
+			{
+				$file_name = $this->uploadImage($image, $slugger);
+				$post->setImage($file_name);
+			}
 
-                // Move the file to the directory where brochures are stored
-                try {
-                    $image->move(
-                        $this->getParameter('images_directory'),
-                        $newFilename
-                    );
-                } catch (FileException $e) {
-                    // ... handle exception if something happens during file upload
-                }
+			$em->persist($post);
+			$em->flush();
 
-                // updates the 'imagename' property to store the PDF file name
-                // instead of its contents
-                $post->setImage($newFilename);
-            }
+			$this->addFlash('success', Posts::SUCCESSFUL_CREATED);
 
+			return $this->redirectToRoute('home');
+		}
 
-            $em->persist($post);
-            $em->flush();
+		return $this->render(
+			'posts/index.html.twig',
+			[
+				'form' => $form->createView(),
+			]
+		);
+	}
 
-            $this->addFlash('success', Posts::SUCCESSFUL_CREATED);
+	/**
+	 * @Route("/posts/{id}/edit", name="posts_edit", methods={"GET","POST"})
+	 */
+	public function edit(Request $request, Posts $post, SluggerInterface $slugger): Response
+	{
+		$form = $this->createForm(PostsType::class, $post);
+		$form->handleRequest($request);
 
-            return $this->redirectToRoute('home');
-        }
-        return $this->render(
-            'posts/index.html.twig',
-            [
-                'form' => $form->createView(),
-            ]
-        );
-    }
+		if ($form->isSubmitted() && $form->isValid())
+		{
+			$image = $form['image']->getData();
 
-    /**
-     * @Route("/myposts", name="myPosts")
-     */
-    public function myPosts()
-    {
-        $em = $this->getDoctrine()->getManager();
-        $user = $this->getUser();
-        $posts = $em->getRepository(Posts::class)->findBy(['user' => $user]);
+			if ($image)
+			{
+				$file_name = $this->uploadImage($image, $slugger);
+				$post->setImage($file_name);
+			}
+			$this->getDoctrine()->getManager()->flush();
+			$this->addFlash('success', Posts::SUCCESSFUL_EDITED);
 
-        return $this->render(
-            'posts/myposts.html.twig',
-            [
-                'posts' => $posts,
-            ]
-        );
-    }
+			return $this->redirectToRoute('myPosts');
+		}
 
-    /**
-     * @Route("/posts/{id}", name="viewPost")
-     */
-    public function view($id)
-    {
-        $em = $this->getDoctrine()->getManager();
-        $post = $em->getRepository(Posts::class)->find($id);
+		return $this->render('posts/edit.html.twig', [
+			'post' => $post,
+			'form' => $form->createView(),
+		]);
+	}
 
-        return $this->render(
-            'posts/view.html.twig',
-            [
-                'post' => $post,
-            ]
-        );
-    }
+	/**
+	 * @Route("/myposts", name="myPosts")
+	 */
+	public function myPosts()
+	{
+		$em    = $this->getDoctrine()->getManager();
+		$user  = $this->getUser();
+		$posts = $em->getRepository(Posts::class)->findBy(['user' => $user]);
+
+		return $this->render(
+			'posts/myposts.html.twig',
+			[
+				'posts' => $posts,
+			]
+		);
+	}
+
+	/**
+	 * @Route("/posts/{id}", name="viewPost")
+	 */
+	public function view($id)
+	{
+		$em   = $this->getDoctrine()->getManager();
+		$post = $em->getRepository(Posts::class)->find($id);
+
+		return $this->render(
+			'posts/view.html.twig',
+			[
+				'post' => $post,
+			]
+		);
+	}
+
+	public function uploadImage($image, $slugger)
+	{
+		$originalFilename = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
+		// this is needed to safely include the file name as part of the URL
+		$safeFilename = $slugger->slug($originalFilename);
+		$newFilename  = $safeFilename . '-' . uniqid() . '.' . $image->guessExtension();
+
+		try
+		{
+			$image->move(
+				$this->getParameter('images_directory'),
+				$newFilename
+			);
+		}
+		catch (FileException $e)
+		{
+		}
+
+		return $newFilename;
+	}
 }

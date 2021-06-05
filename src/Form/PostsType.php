@@ -9,6 +9,8 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PostsType extends AbstractType
@@ -18,7 +20,8 @@ class PostsType extends AbstractType
 		$builder
 			->add('title', TextType::class)
 			->add('image', FileType::class, [
-				'label' => 'Select image'
+				'label'      => 'Select image',
+				'data_class' => null
 			])
 			->add('content', TextareaType::class);
 	}
